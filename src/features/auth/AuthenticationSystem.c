@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include "auth/AuthenticationSystem.h"
 #include "globals.h"
-
+#include <conio.h>
 User user;
 int takepassword(char pass[50])
 {
