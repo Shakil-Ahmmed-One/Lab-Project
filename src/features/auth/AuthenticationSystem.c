@@ -8,6 +8,39 @@
 #include "globals.h"
 
 User user;
+int takepassword(char pass[50])
+{
+    char ch;
+    int i = 0;
+    while (1)
+    {
+        ch = getch();
+        if (ch == 32 || ch == 9 || ch == 10 || ch == 11 || ch == 12 || ch == 27)
+        {
+            continue;
+        }
+        else if (ch == 13)
+        {
+            pass[i] = '\0';
+            printf("\n");
+            break;
+        }
+        else if (ch == 8)
+        {
+            if (i >0)
+            {
+                i--;
+                printf("\b \b");
+            }
+        }
+        else
+        {
+            pass[i] = ch;
+            i++;
+            printf("*");
+        }
+    }
+}
 int isValidPassword(char *password) {
     int len = strlen(password);
     if (len < 8) return 0;
@@ -27,7 +60,7 @@ bool signIn()
     printf("Enter username: ");
     scanf("%20s", user.username);
     printf("Enter password: ");
-    scanf("%64s", user.password);
+    takepassword(user.password);
     FILE *fp = fopen("data/users/users.dat", "a+");
 
     if (fp == NULL)
@@ -57,9 +90,9 @@ bool signUp()
     scanf("%20s", user.username);
     char confirmPassword[65];
     printf("Enter password: ");
-    scanf("%64s", user.password);
+    takepassword(user.password);
     printf("Confirm password: ");
-    scanf("%64s", confirmPassword);
+    takepassword(confirmPassword);
     if (strcmp(user.password, confirmPassword) != 0) {
         printf("Passwords do not match!\n");
         return false;
