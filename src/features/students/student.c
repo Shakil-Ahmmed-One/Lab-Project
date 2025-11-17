@@ -63,6 +63,21 @@ void addStudent()
 Student findStudentByRoll(unsigned int roll)
 {
     Student student;
+    int status;
+
+    status = MKDIR("data", 0777);
+    if (status == -1 && errno != EEXIST)
+    {
+        perror("Accessing data failed");
+        student.roll = 0;
+    }
+
+    status = MKDIR("data/students", 0777);
+    if (status == -1 && errno != EEXIST)
+    {
+        perror("Accessing data/students failed");
+        student.roll = 0;
+    }
     FILE *fp = fopen("data/students/students.txt", "a+");
     if (fp == NULL)
     {
