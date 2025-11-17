@@ -139,11 +139,11 @@ void deleteStudent()
 
     bool found = false;
     Student student;
-    while (fscanf(fp, "\n%99[^0-9] %u", student.name, &student.roll) == 2)
+    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4)
     {
         if (student.roll != roll)
         {
-            fprintf(fp2, "%s %u\n", student.name, student.roll);
+            fprintf(fp2, "%s %u %u %u\n", student.name, student.roll, student.year, student.term);
         }
         else
         {
@@ -154,7 +154,7 @@ void deleteStudent()
     fclose(fp);
     if (remove("data/students/students.txt") != 0 || rename("data/students/temp.txt", "data/students/students.txt") != 0)
     {
-        printf("Failed to delete Student\n");
+        perror("Failed to delete Student");
     }
     else if (!found)
     {

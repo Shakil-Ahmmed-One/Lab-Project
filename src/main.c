@@ -1,16 +1,52 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "students/student.h"
 #include "courses/course.h"
 #include "results/result.h"
 #include "auth/AuthenticationSystem.h"
 #include "menu/menu.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    AppState state = STATE_AUTH;
-
+    AppState state;
+    User user1;
+    if (argc >= 3)
+    {
+        strncpy(user1.username, argv[1],strlen(argv[1]));
+        user1.username[strlen(argv[1])] = '\0';
+        strncpy(user1.password, argv[2],strlen(argv[2]));
+        user1.password[strlen(argv[2])] = '\0';
+        FILE *fp = fopen("data/users/users.dat", "r");
+        if (fp == NULL)
+        {
+            perror("Failed to open users.dat");
+            state=STATE_AUTH;
+            fclose(fp);
+        }
+        while (!feof(fp))
+        {
+            if (fread(&user, sizeof(User), 1, fp))
+            {
+                if (strcmp(user1.username, user.username) == 0)
+                {
+                    state= STATE_MAIN_MENU;
+                    fclose(fp);
+                    break;
+                }
+            }
+            else
+            {
+                fclose(fp);
+                break;
+            }
+        }
+    }
+    else
+    {
+        state = STATE_AUTH;
+    }
     while (state != STATE_EXIT)
     {
         switch (state)
@@ -26,7 +62,6 @@ int main()
                 state = STATE_EXIT;
             break;
         }
-
         case STATE_MAIN_MENU:
         {
             printf("\nWelcome, %s!\n", user.username);
