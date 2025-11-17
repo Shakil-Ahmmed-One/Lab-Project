@@ -11,8 +11,6 @@ typedef struct
 
 extern User user;
 
-bool signIn();
-bool signUp();
 bool auth();
 
 #endif // AUTHENTICATION_SYSTEM_H_INCLUDED

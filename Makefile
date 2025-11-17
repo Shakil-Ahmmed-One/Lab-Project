@@ -19,6 +19,29 @@ SRCS = $(wildcard src/*.c) \
 # Note: GNU Make automatically handles spaces in filenames in the OBJS list.
 OBJS = $(SRCS:.c=.o)
 
+# Detect OS and shell type automatically
+ifeq ($(OS),Windows_NT)
+    ifneq (,$(findstring /, $(SHELL)))
+        # Using Unix-like shell on Windows (Git Bash, MSYS, etc.)
+        RM = rm -f
+        NULL = 2>/dev/null
+        SEP = /
+    else
+        # Using cmd.exe
+        SHELL := cmd.exe
+        .SHELLFLAGS := /C
+        RM = del /Q
+        NULL = 2>nul
+        SEP = \\
+    endif
+else
+    # Linux/macOS
+    RM = rm -f
+    NULL = 2>/dev/null
+    SEP = /
+endif
+
+
 # Default target (what runs when you just type 'make')
 all: $(TARGET)
 
@@ -27,7 +50,9 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	@echo "Linking $(TARGET)..."
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-#rm -f $(OBJS)
+
+	$(RM) $(subst /,$(SEP),$(OBJS)) $(NULL)
+
 	@echo "Build complete! Run with ./${TARGET}"
 
 # Generic rule to compile .c files to .o files
@@ -39,9 +64,7 @@ $(TARGET): $(OBJS)
 # Clean target to remove generated files
 clean:
 	@echo "Cleaning up..."
-# Use 'find' and 'xargs rm' for Unix/Linux/WSL compatibility
-#rm -f $(OBJS) $(TARGET)
-# Original Windows/DOS command for clean target
-	-del /Q $(subst /,\,$(OBJS)) $(TARGET) $(TARGET).exe 2>nul
+	$(RM) $(subst /,$(SEP),$(OBJS)) $(TARGET) $(TARGET).exe $(NULL)
+
 # Phony targets (targets that aren't actual files)
 .PHONY: all clean

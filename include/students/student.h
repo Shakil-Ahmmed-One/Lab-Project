@@ -1,18 +1,17 @@
 #ifndef STUDENT_H
 #define STUDENT_H
 
-#include <stdio.h>
 #include "menu/menu.h"
 
 typedef struct
 {
     char name[100];
     unsigned int roll;
+    unsigned int year;
+    unsigned int term;
 } Student;
 
-void addStudent(Student *student);
-void displayStudent(Student *student);
-void deleteStudent(Student *student);
+Student findStudentByRoll(unsigned int);
 AppState manageStudents();
 
 #endif // STUDENT_H

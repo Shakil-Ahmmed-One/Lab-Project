@@ -7,7 +7,7 @@
 #include "menu/menu.h"
 #include "globals.h"
 
-void addStudent(Student *student)
+void addStudent()
 {
     printf("\nAdd Student\n");
     printf("-------------\n");
@@ -21,6 +21,16 @@ void addStudent(Student *student)
     scanf("%u", &roll);
     getchar();
 
+    printf("Enter Student Year: ");
+    unsigned int year;
+    scanf("%u", &year);
+    getchar();
+
+    printf("Enter Student Term: ");
+    unsigned int term;
+    scanf("%u", &term);
+    getchar();
+
     FILE *fp = fopen("data/students/students.txt", "a+");
     if (fp == NULL)
     {
@@ -28,60 +38,77 @@ void addStudent(Student *student)
     }
 
     bool found = false;
-    while (fscanf(fp, "\n%99[^0-9] %u", student->name, &student->roll) == 2 && fp != NULL)
+    Student student;
+    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4 && fp != NULL)
     {
-        if (student->roll == roll)
+        if (student.roll == roll)
         {
             found = true;
             printf("\nStudent is already added in the database.\n");
-            printf("Name: %s\n", student->name);
-            printf("Roll: %u\n", student->roll);
+            printf("Name: %s\n", student.name);
+            printf("Roll: %u\n", student.roll);
+            printf("Session: %u-%u\n", student.year, student.term);
             break;
         }
     }
     if (!found)
     {
-        fprintf(fp, "%s %u\n", name, roll);
+        fprintf(fp, "%s %u %u %u\n", name, roll, year, term);
         printf("Student added successfully!\n");
     }
 
     fclose(fp);
 }
 
-void displayStudent(Student *student)
+Student findStudentByRoll(unsigned int roll)
 {
-    printf("\nDisplay Student\n");
-    printf("-------------\n");
-    printf("Enter Student Roll: ");
-    unsigned int roll;
-    scanf("%u", &roll);
-    getchar();
-    FILE *fp = fopen("data/students/students.txt", "r");
+    Student student;
+    FILE *fp = fopen("data/students/students.txt", "a+");
     if (fp == NULL)
     {
         perror("Failed to open students.txt");
     }
 
     bool found = false;
-    while (fscanf(fp, "\n%99[^0-9] %u", student->name, &student->roll) == 2 && fp != NULL)
+    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4 && fp != NULL)
     {
-        if (student->roll == roll)
+        if (student.roll == roll)
         {
             found = true;
-            printf("\nStudent found:\n");
-            printf("Name: %s\n", student->name);
-            printf("Roll: %u\n", student->roll);
             break;
         }
     }
     if (!found)
     {
-        printf("No student was found!\n");
+        student.roll = 0; // Indicate not found
     }
     fclose(fp);
+    return student;
 }
 
-void deleteStudent(Student *student)
+void displayStudent()
+{
+    printf("\nDisplay Student\n");
+    printf("-------------\n");
+    printf("Enter Student Roll: ");
+    unsigned int roll;
+    scanf("%u", &roll);
+
+    Student student = findStudentByRoll(roll);
+    if (student.roll == 0)
+    {
+        printf("No student was found!\n");
+    }
+    else
+    {
+        printf("\nStudent found:\n");
+        printf("Name: %s\n", student.name);
+        printf("Roll: %u\n", student.roll);
+        printf("Session: %u-%u\n", student.year, student.term);
+    }
+}
+
+void deleteStudent()
 {
     printf("\nDelete Student\n");
     printf("-------------\n");
@@ -96,11 +123,12 @@ void deleteStudent(Student *student)
     FILE *fp2 = fopen("data/students/temp.txt", "w");
 
     bool found = false;
-    while (fscanf(fp, "\n%99[^0-9] %u", student->name, &student->roll) == 2 && fp != NULL)
+    Student student;
+    while (fscanf(fp, "\n%99[^0-9] %u", student.name, &student.roll) == 2 && fp != NULL)
     {
-        if (student->roll != roll)
+        if (student.roll != roll)
         {
-            fprintf(fp2, "%s %u\n", student->name, student->roll);
+            fprintf(fp2, "%s %u\n", student.name, student.roll);
         }
         else
         {
@@ -125,8 +153,6 @@ void deleteStudent(Student *student)
 
 AppState manageStudents()
 {
-    Student student;
-    
     while (1)
     {
         int choice;
@@ -161,27 +187,24 @@ AppState manageStudents()
         {
         case 1:
         {
-            addStudent(&student);
+            addStudent();
             break;
         }
         case 2:
         {
-            displayStudent(&student);
+            displayStudent();
             break;
         }
         case 3:
         {
-            deleteStudent(&student);
+            deleteStudent();
             break;
         }
         case 4:
+        case 5:
         {
             return STATE_MAIN_MENU;
             break;
-        }
-        case 5:
-        {
-            return STATE_AUTH;
         }
         default:
         {

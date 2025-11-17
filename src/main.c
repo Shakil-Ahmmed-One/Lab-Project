@@ -2,7 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "students/student.h"
-#include "students/result.h"
+#include "courses/course.h"
+#include "results/result.h"
 #include "auth/AuthenticationSystem.h"
 #include "menu/menu.h"
 
@@ -32,8 +33,9 @@ int main()
             printf("-----------------------------\n");
             printf("1. Manage Students\n");
             printf("2. Manage Results\n");
-            printf("3. Log Out\n");
-            printf("4. Exit Program\n");
+            printf("3. Manage Courses\n");
+            printf("4. Log Out\n");
+            printf("5. Exit Program\n");
 
             int choice;
             printf("Enter your choice: ");
@@ -48,9 +50,12 @@ int main()
                 state = STATE_RESULT_MENU;
                 break;
             case 3:
-                state = STATE_AUTH;
+                state = STATE_COURSE_MENU;
                 break;
             case 4:
+                state = STATE_AUTH;
+                break;
+            case 5:
                 state = STATE_EXIT;
                 break;
             default:
@@ -69,6 +74,12 @@ int main()
         case STATE_RESULT_MENU:
         {
             state = manageResults();
+            break;
+        }
+
+        case STATE_COURSE_MENU:
+        {
+            state = manageCourses();
             break;
         }
 

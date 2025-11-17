@@ -8,7 +8,7 @@
 #include "globals.h"
 #include <conio.h>
 User user;
-int takepassword(char pass[50])
+void takepassword(char pass[50])
 {
     char ch;
     int i = 0;
