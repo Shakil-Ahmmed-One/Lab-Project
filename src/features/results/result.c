@@ -182,6 +182,7 @@ AppState manageResults()
         {
             printf("No student found with roll %u.\n", roll);
             return STATE_MAIN_MENU;
+            return STATE_MAIN_MENU;
         }
 
         printf("\nResult of Roll %u\n", roll);
