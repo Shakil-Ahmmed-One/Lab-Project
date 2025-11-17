@@ -18,104 +18,6 @@ void viewFileContent(FILE *fp)
     printf("\n");
 }
 
-void deleteCourseRecord(const char *filename)
-{
-    char courseToDelete[MAX_LEN];
-    printf("Enter course code/name to delete: ");
-    scanf("%s", courseToDelete);
-    getchar();
-
-    FILE *fp = fopen(filename, "r");
-    FILE *temp = fopen("temp.txt", "w");
-    if (fp == NULL || temp == NULL)
-    {
-        perror("Error opening files for deletion");
-        return;
-    }
-
-    char line[200];
-    int found = 0;
-    while (fgets(line, sizeof(line), fp))
-    {
-        if (strstr(line, courseToDelete) == line)
-        {
-            found = 1;
-            continue;
-        }
-        fputs(line, temp);
-    }
-
-    fclose(fp);
-    fclose(temp);
-
-    remove(filename);
-    rename("temp.txt", filename);
-
-    if (found)
-        printf("Record for course %s deleted successfully!\n", courseToDelete);
-    else
-        printf("Record for course %s not found!\n", courseToDelete);
-}
-
-void editCourseRecord(const char *filename)
-{
-    char oldCourse[MAX_LEN];
-    printf("Enter course code/name to edit: ");
-    scanf("%s", oldCourse);
-    getchar();
-
-    char newCourse[MAX_LEN];
-    printf("Enter NEW course code/name: ");
-    scanf("%s", newCourse);
-    getchar();
-
-    FILE *fp = fopen(filename, "r");
-    FILE *temp = fopen("temp.txt", "w");
-    if (!fp || !temp)
-    {
-        perror("Error opening files for editing");
-        if (fp)
-            fclose(fp);
-        if (temp)
-            fclose(temp);
-        return;
-    }
-
-    char line[200];
-    int found = 0;
-    while (fgets(line, sizeof(line), fp))
-    {
-        if (strstr(line, oldCourse) == line)
-        {
-            found = 1;
-            char rest[150];
-            if (sscanf(line + strlen(oldCourse), " %[^\n]", rest) == 1)
-            {
-                fprintf(temp, "%s %s\n", newCourse, rest);
-            }
-            else
-            {
-                fprintf(temp, "%s\n", newCourse);
-            }
-        }
-        else
-        {
-            fputs(line, temp);
-        }
-    }
-
-    fclose(fp);
-    fclose(temp);
-
-    remove(filename);
-    rename("temp.txt", filename);
-
-    if (found)
-        printf("Course record for %s updated to %s successfully!\n", oldCourse, newCourse);
-    else
-        printf("Course record for %s not found!\n", oldCourse);
-}
-
 double calculateCGPA(Student *student)
 {
 
@@ -279,7 +181,7 @@ AppState manageResults()
         if (student.roll == 0)
         {
             printf("No student found with roll %u.\n", roll);
-            return STATE_RESULT_MENU;
+            return STATE_MAIN_MENU;
         }
 
         printf("\nResult of Roll %u\n", roll);
@@ -376,9 +278,7 @@ AppState manageResults()
             printf("------------\n");
             printf("1. View Term Results\n");
             printf("2. Add Term Result\n");
-            printf("3. Delete Term Result\n");
-            printf("4. Edit Term Result\n");
-            printf("5. Go Back\n");
+            printf("3. Go Back\n");
             printf("Enter your choice: ");
 
             int termChoice;
@@ -409,17 +309,8 @@ AppState manageResults()
                 break;
             }
             case 3:
-            {
-                fclose(fp);
-                deleteCourseRecord(termFilePath);
+                return STATE_MAIN_MENU;
                 break;
-            }
-            case 4:
-            {
-                fclose(fp);
-                editCourseRecord(termFilePath);
-                break;
-            }
             default:
                 break;
             }
