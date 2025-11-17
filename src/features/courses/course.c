@@ -28,7 +28,7 @@ void addCourse(char *filePath)
     }
     Course course;
     bool found = false;
-    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2 && fp != NULL)
+    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2)
     {
         if (strcmp(course.name, name) == 0)
         {
@@ -60,7 +60,7 @@ void allCourses(char *filePath)
     Course course;
     printf("%-30s %-10s\n", "Course Name", "Credit");
     printf("-----------------------------------------\n");
-    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2 && fp != NULL)
+    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2)
     {
         printf("%-30s %-10.2lf\n", course.name, course.credit);
     }
@@ -84,7 +84,7 @@ void deleteCourse(char *filePath)
     FILE *fp2 = fopen("data/courses/temp.txt", "w");
     Course course;
     bool found = false;
-    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2 && fp != NULL)
+    while (fscanf(fp, "\n%s %lf", course.name, &course.credit) == 2)
     {
         if (strcmp(course.name, name) != 0)
         {

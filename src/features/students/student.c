@@ -39,7 +39,7 @@ void addStudent()
 
     bool found = false;
     Student student;
-    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4 && fp != NULL)
+    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4)
     {
         if (student.roll == roll)
         {
@@ -70,7 +70,7 @@ Student findStudentByRoll(unsigned int roll)
     }
 
     bool found = false;
-    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4 && fp != NULL)
+    while (fscanf(fp, "\n%99[^0-9] %u %u %u", student.name, &student.roll, &student.year, &student.term) == 4)
     {
         if (student.roll == roll)
         {
@@ -124,7 +124,7 @@ void deleteStudent()
 
     bool found = false;
     Student student;
-    while (fscanf(fp, "\n%99[^0-9] %u", student.name, &student.roll) == 2 && fp != NULL)
+    while (fscanf(fp, "\n%99[^0-9] %u", student.name, &student.roll) == 2)
     {
         if (student.roll != roll)
         {

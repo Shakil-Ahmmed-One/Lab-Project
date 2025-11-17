@@ -8,7 +8,7 @@
 #include "globals.h"
 #include <conio.h>
 User user;
-void takepassword(char pass[50])
+void takepassword(char pass[65])
 {
     char ch;
     int i = 0;
@@ -27,7 +27,7 @@ void takepassword(char pass[50])
         }
         else if (ch == 8)
         {
-            if (i >0)
+            if (i > 0)
             {
                 i--;
                 printf("\b \b");
@@ -41,13 +41,18 @@ void takepassword(char pass[50])
         }
     }
 }
-int isValidPassword(char *password) {
+int isValidPassword(char *password)
+{
     int len = strlen(password);
-    if (len < 8) return 0;
+    if (len < 8)
+        return 0;
     int hasAlpha = 0, hasDigit = 0;
-    for (int i = 0; i < len; i++) {
-        if (isalpha(password[i])) hasAlpha = 1;
-        else if (isdigit(password[i])) hasDigit = 1;
+    for (int i = 0; i < len; i++)
+    {
+        if (isalpha(password[i]))
+            hasAlpha = 1;
+        else if (isdigit(password[i]))
+            hasDigit = 1;
     }
     return hasAlpha && hasDigit;
 }
@@ -84,28 +89,50 @@ bool signIn()
 
 bool signUp()
 {
+    FILE *fp = fopen("data/users/users.dat", "a+");
+    if (fp == NULL)
+    {
+        perror("Failed to access users.dat");
+        return false;
+    }
+    rewind(fp);
     printf("\nSign Up\n");
     printf("-------\n");
     printf("Enter username (without spaces): ");
     scanf("%20s", user.username);
+
+    while (!feof(fp))
+    {
+        User existingUser;
+        if (fread(&existingUser, sizeof(User), 1, fp))
+        {
+            if (strcmp(user.username, existingUser.username) == 0)
+            {
+                printf("Username already exists! Please choose a different username.\n");
+                fclose(fp);
+                return false;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    fseek(fp, 0, SEEK_END);
+
     char confirmPassword[65];
     printf("Enter password: ");
     takepassword(user.password);
     printf("Confirm password: ");
     takepassword(confirmPassword);
-    if (strcmp(user.password, confirmPassword) != 0) {
+    if (strcmp(user.password, confirmPassword) != 0)
+    {
         printf("Passwords do not match!\n");
         return false;
     }
-    if(isValidPassword(user.password) == 0) {
-        printf("Password must be at least 8 characters long and contain both letters and digits.\n");
-        return false;
-    }
-
-    FILE *fp = fopen("data/users/users.dat", "a");
-    if (fp == NULL)
+    if (isValidPassword(user.password) == 0)
     {
-        perror("Failed to access users.dat");
+        printf("Password must be at least 8 characters long and contain both letters and digits.\n");
         return false;
     }
 

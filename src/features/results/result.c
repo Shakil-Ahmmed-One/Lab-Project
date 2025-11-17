@@ -6,30 +6,27 @@
 #include "students/student.h"
 #include "courses/course.h"
 
-// Define MAX_LEN for use in the new functions/logic
 #define MAX_LEN 50
 
-// Helper function to show file content (like case 4 in student_numbers.c)
 void viewFileContent(FILE *fp)
 {
     char ch;
     printf("\n--- File Content ---\n");
-    fseek(fp, 0, SEEK_SET); // Rewind to start of file
+    rewind(fp);
     while ((ch = fgetc(fp)) != EOF)
         putchar(ch);
     printf("\n");
 }
 
-// Function to delete a course record from the file
 void deleteCourseRecord(const char *filename)
 {
     char courseToDelete[MAX_LEN];
     printf("Enter course code/name to delete: ");
     scanf("%s", courseToDelete);
-    getchar(); // Consume newline
+    getchar();
 
     FILE *fp = fopen(filename, "r");
-    FILE *temp = fopen("temp.txt", "w"); // Use 'w' to overwrite temp file
+    FILE *temp = fopen("temp.txt", "w");
     if (fp == NULL || temp == NULL)
     {
         perror("Error opening files for deletion");
@@ -40,12 +37,10 @@ void deleteCourseRecord(const char *filename)
     int found = 0;
     while (fgets(line, sizeof(line), fp))
     {
-        // Simple check: if the line starts with the courseToDelete string.
-        // This relies on the course name being the first word/string.
         if (strstr(line, courseToDelete) == line)
         {
             found = 1;
-            continue; // skip this course line
+            continue;
         }
         fputs(line, temp);
     }
@@ -53,7 +48,6 @@ void deleteCourseRecord(const char *filename)
     fclose(fp);
     fclose(temp);
 
-    // Replace original file with temporary file
     remove(filename);
     rename("temp.txt", filename);
 
@@ -63,21 +57,20 @@ void deleteCourseRecord(const char *filename)
         printf("Record for course %s not found!\n", courseToDelete);
 }
 
-// Function to edit a course record in the file
 void editCourseRecord(const char *filename)
 {
     char oldCourse[MAX_LEN];
     printf("Enter course code/name to edit: ");
     scanf("%s", oldCourse);
-    getchar(); // Consume newline
+    getchar();
 
     char newCourse[MAX_LEN];
     printf("Enter NEW course code/name: ");
     scanf("%s", newCourse);
-    getchar(); // Consume newline
+    getchar();
 
     FILE *fp = fopen(filename, "r");
-    FILE *temp = fopen("temp.txt", "w"); // Use 'w' to overwrite temp file
+    FILE *temp = fopen("temp.txt", "w");
     if (!fp || !temp)
     {
         perror("Error opening files for editing");
@@ -95,17 +88,13 @@ void editCourseRecord(const char *filename)
         if (strstr(line, oldCourse) == line)
         {
             found = 1;
-            // The logic from student_numbers.c: replace the course name at the start
             char rest[150];
-            // Read the rest of the line (after the oldCourse name and space)
-            // Assuming format is "CourseName Space TheRest"
             if (sscanf(line + strlen(oldCourse), " %[^\n]", rest) == 1)
             {
                 fprintf(temp, "%s %s\n", newCourse, rest);
             }
             else
             {
-                // If there's nothing after the course name, just write the new one.
                 fprintf(temp, "%s\n", newCourse);
             }
         }
@@ -118,7 +107,6 @@ void editCourseRecord(const char *filename)
     fclose(fp);
     fclose(temp);
 
-    // Replace original file with temporary file
     remove(filename);
     rename("temp.txt", filename);
 
@@ -156,12 +144,10 @@ double calculateCGPA(Student *student)
         return STATE_MAIN_MENU;
     }
 
-    // The file path for the Term results
-    char termFilePath[sizeof(foldername) + 10]; // 30 + 10 = 40
+    char termFilePath[sizeof(foldername) + 10];
     sprintf(termFilePath, "%s/term.txt", foldername);
 
-    // The file path for the CT results
-    char ctFilePath[sizeof(foldername) + 10]; // 30 + 10 = 40
+    char ctFilePath[sizeof(foldername) + 10];
     sprintf(ctFilePath, "%s/ct.txt", foldername);
 
     FILE *fpCT = fopen(ctFilePath, "a+");
@@ -215,7 +201,6 @@ double calculateCGPA(Student *student)
             }
         }
 
-        // Calculate grade points based on score
         double gradePoint = (double)(totalTermNumber + totalCTNumber + 90) * 100 / totalScore; // TODO: 90 is hardcoded
         double g;
         if (gradePoint >= 80)
@@ -266,7 +251,6 @@ AppState manageResults()
 
         int status;
 
-        // Using MKDIR from globals.h (assuming it's a wrapper for mkdir)
         status = MKDIR("data", 0777);
         if (status == -1 && errno != EEXIST)
         {
@@ -300,7 +284,7 @@ AppState manageResults()
 
         printf("\nResult of Roll %u\n", roll);
         printf("----------------------\n");
-        printf("Name: %s\n", student.name); // Assuming a function to get student name
+        printf("Name: %s\n", student.name);
         printf("Approximate CGPA: %.2lf\n", calculateCGPA(&student));
         printf("----------------------\n");
         printf("1. CT\n");
@@ -313,22 +297,18 @@ AppState manageResults()
         scanf("%d", &choice);
         getchar();
 
-        FILE *fp = NULL; // Initialize fp to NULL
+        FILE *fp = NULL;
 
-        // The file path for the Term results
-        char termFilePath[sizeof(foldername) + 10]; // 30 + 10 = 40
+        char termFilePath[sizeof(foldername) + 10];
         sprintf(termFilePath, "%s/term.txt", foldername);
 
-        // The file path for the CT results
-        char ctFilePath[sizeof(foldername) + 10]; // 30 + 10 = 40
+        char ctFilePath[sizeof(foldername) + 10];
         sprintf(ctFilePath, "%s/ct.txt", foldername);
 
         switch (choice)
         {
         case 1:
         {
-            // Note: strcat(foldername, "/ct.txt") modifies foldername,
-            // which can mess up the paths later. Using a separate path string (ctFilePath) is safer.
             fp = fopen(ctFilePath, "a+");
             if (fp == NULL)
             {
@@ -371,7 +351,6 @@ AppState manageResults()
                 scanf("%lf", &ctScore);
                 getchar();
 
-                // Format: CourseName CT # : Score
                 fprintf(fp, "%s -> CT %u: %.2f\n", course, ctNumber, ctScore);
                 printf("CT Result added successfully.\n");
                 break;
@@ -410,7 +389,7 @@ AppState manageResults()
             {
             case 1:
             {
-                viewFileContent(fp); // View results
+                viewFileContent(fp);
                 break;
             }
             case 2:
@@ -437,7 +416,6 @@ AppState manageResults()
             }
             case 4:
             {
-                // Edit Course Record (Feature from student_numbers.c)
                 fclose(fp);
                 editCourseRecord(termFilePath);
                 break;
@@ -455,6 +433,23 @@ AppState manageResults()
         {
             printf("Overall Results\n");
             printf("---------------\n");
+            fp = fopen(ctFilePath, "a+");
+            if (fp == NULL)
+            {
+                perror("Failed to open ct.txt");
+                return STATE_MAIN_MENU;
+            }
+            viewFileContent(fp);
+            printf("\n");
+            fclose(fp);
+            fp = fopen(termFilePath, "a+");
+            if (fp == NULL)
+            {
+                perror("Failed to open term.txt");
+                return STATE_MAIN_MENU;
+            }
+            viewFileContent(fp);
+            fclose(fp);
             break;
         }
         case 4:
